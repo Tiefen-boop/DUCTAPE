@@ -107,15 +107,15 @@ function compileNormal(graph: ir.Graph, cppFile: string): void {
 }
 
 function compileGradual(graph: ir.Graph, cppFile: string, exportedFunctionNames: string[]): void {
+    const exportedSubgraphs: ir.Graph[] = [];
     const exportedFunctions: ExportedFunction[] = exportedFunctionNames.map(name => {
         const subgraph = findSubgraphByName(graph, name);
         if (!subgraph) throw new Error(`Function '${name}' not found in graph`);
         const funcType = subgraph.verifiedType;
         if (!(funcType instanceof ir.FunctionType)) throw new Error(`'${name}' did not get a FunctionType after hydration`);
+        exportedSubgraphs.push(subgraph);
         return { name, paramTypes: funcType.parameterTypes, returnType: funcType.returnType };
     });
-
-    const exportedSubgraphs = exportedFunctionNames.map(n => findSubgraphByName(graph, n)!);
     const reachable = collectReachableSubgraphs(graph, exportedSubgraphs);
     const filteredGraph = buildFilteredGraph(graph, reachable);
 
