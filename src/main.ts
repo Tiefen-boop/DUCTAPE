@@ -102,8 +102,9 @@ function buildFilteredGraph(rootGraph: ir.Graph, reachable: Set<ir.Graph>): ir.G
 }
 
 function compileNormal(graph: ir.Graph, cppFile: string): void {
+    const outputFile = options['output-file'] ?? 'a.out';
     fs.appendFileSync(cppFile, generateCpp(graph), { flag: 'a' });
-    execSync(`clang++ -O3 -Wno-narrowing -std=c++17 -o ${options['output-file']} -Inode_modules/graphir-compiler/lib ${cppFile}`);
+    execSync(`clang++ -O3 -Wno-narrowing -std=c++17 -o ${outputFile} -Inode_modules/graphir-compiler/lib ${cppFile}`);
 }
 
 function compileGradual(graph: ir.Graph, cppFile: string, exportedFunctionNames: string[]): void {
@@ -125,10 +126,12 @@ function compileGradual(graph: ir.Graph, cppFile: string, exportedFunctionNames:
     const code = rawCode.replace(/\nextern "C" \S+ main\(.*$/s, '\n');
     fs.appendFileSync(cppFile, code, { flag: 'a' });
 
-    fs.writeFileSync('addon.cpp', generateAddonCpp(exportedFunctions));
-    fs.writeFileSync('binding.gyp', generateBindingGyp());
-    execSync('npx node-gyp rebuild', { stdio: 'inherit' });
-    console.log('Addon built: build/Release/addon.node');
+    const outputFile = options['output-file'] ?? 'addon.node';
+    fs.writeFileSync('out/addon.cpp', generateAddonCpp(exportedFunctions));
+    fs.writeFileSync('out/binding.gyp', generateBindingGyp());
+    execSync('npx node-gyp rebuild', { stdio: 'inherit', cwd: 'out' });
+    fs.copyFileSync('out/build/Release/addon.node', outputFile);
+    console.log(`Addon built: ${outputFile}`);
 }
 
 async function main() {

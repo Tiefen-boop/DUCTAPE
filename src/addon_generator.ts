@@ -301,10 +301,10 @@ export function generateBindingGyp(): string {
         ],
         targets: [{
             target_name: 'addon',
-            sources: ['addon.cpp', 'out/tmp.cpp'],
+            sources: ['addon.cpp', 'tmp.cpp'],
             include_dirs: [
                 `<!@(node -p "require('node-addon-api').include")`,
-                'node_modules/graphir-compiler/lib',
+                '../node_modules/graphir-compiler/lib',
             ],
             'cflags!': ['-fno-exceptions'],
             'cflags_cc!': ['-fno-exceptions'],

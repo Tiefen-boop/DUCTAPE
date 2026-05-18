@@ -4,6 +4,5 @@ node_modules
 
 build
 out
-addon.cpp
-binding.gyp
 *.out
+*.node
