@@ -6,3 +6,5 @@ build
 out
 *.out
 *.node
+*.d.ts
+dt_*

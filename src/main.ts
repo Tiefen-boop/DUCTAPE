@@ -12,6 +12,7 @@ import { generateContext } from './context_manager.js';
 import { hydrateTypesFromFiles, typeNameToType } from './type_hydration.js';
 import { transformGraph } from './transformation.js';
 import { generateAddonCpp, generateBindingGyp, ExportedFunction } from './addon_generator.js';
+import { generateDtFile, generateDeclFile } from './source_transformer.js';
 
 const options = getCliOptions();
 
@@ -132,6 +133,8 @@ function compileGradual(graph: ir.Graph, cppFile: string, exportedFunctionNames:
     execSync('npx node-gyp rebuild', { stdio: 'inherit', cwd: 'out' });
     fs.copyFileSync('out/build/Release/addon.node', outputFile);
     console.log(`Addon built: ${outputFile}`);
+    generateDeclFile(exportedFunctions, outputFile);
+    generateDtFile(options['input-file'], exportedFunctions, outputFile);
 }
 
 async function main() {
